@@ -1,0 +1,10 @@
+{
+  "name": "llm-tuner-console",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Web 上位机：多分页串口波形 / 参数调参 / 智能体",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "start:ps": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/serve.ps1"
+  }
+}

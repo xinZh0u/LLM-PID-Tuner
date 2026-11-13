@@ -1,0 +1,122 @@
+{
+  "name": "llm-tuner",
+  "displayName": "LLM_Tuner",
+  "description": "LLM_Tuner 网页上位机：左侧图标一键在内置浏览器里打开波形/调参面板，并为网页提供工作区源码读写桥接",
+  "version": "0.1.0",
+  "publisher": "local",
+  "private": true,
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "serial",
+    "tuner",
+    "vofa",
+    "plot",
+    "waveform"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onView:llmTuner.panel",
+    "onCommand:llmTuner.open",
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "llmTuner",
+          "title": "LLM_Tuner",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "llmTuner": [
+        {
+          "id": "llmTuner.panel",
+          "type": "webview",
+          "name": "上位机",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "llmTuner.open",
+          "when": "view == llmTuner.panel",
+          "group": "navigation@1"
+        },
+        {
+          "command": "llmTuner.openExternal",
+          "when": "view == llmTuner.panel",
+          "group": "navigation@2"
+        },
+        {
+          "command": "llmTuner.copyToken",
+          "when": "view == llmTuner.panel",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "llmTuner.open",
+        "title": "LLM_Tuner: 在内置浏览器中打开上位机",
+        "icon": "$(browser)"
+      },
+      {
+        "command": "llmTuner.openExternal",
+        "title": "LLM_Tuner: 在系统浏览器中打开（串口可用）",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "llmTuner.copyToken",
+        "title": "LLM_Tuner: 复制桥接令牌",
+        "icon": "$(key)"
+      },
+      {
+        "command": "llmTuner.showInfo",
+        "title": "LLM_Tuner: 显示桥接信息"
+      },
+      {
+        "command": "llmTuner.restart",
+        "title": "LLM_Tuner: 重启本地服务"
+      }
+    ],
+    "configuration": {
+      "title": "LLM_Tuner",
+      "properties": {
+        "llmTuner.port": {
+          "type": "number",
+          "default": 5173,
+          "description": "本地服务端口（只监听 127.0.0.1，同时提供网页和源码桥接接口）"
+        },
+        "llmTuner.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "VS Code 启动时自动开启本地服务"
+        },
+        "llmTuner.autoOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "点击左侧 LLM_Tuner 图标时自动在内置浏览器中打开面板"
+        },
+        "llmTuner.webRoot": {
+          "type": "string",
+          "default": "",
+          "description": "自定义网页目录（留空则用扩展内置的 web/ 目录）"
+        },
+        "llmTuner.maxFiles": {
+          "type": "number",
+          "default": 800,
+          "description": "源码扫描返回的最大文件数"
+        }
+      }
+    }
+  }
+}

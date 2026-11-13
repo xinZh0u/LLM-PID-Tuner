@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>LLM_Tuner</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 15.5h3.1l2.3-8.6 3.4 12.2 3.1-9.3 2.1 5.7H22' fill='none' stroke='%230d9c8b' stroke-width='1.7'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  // 尽早定主题，避免首帧闪一下
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('llmtuner.theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    document.documentElement.dataset.theme = t;
+    document.documentElement.style.colorScheme = t;
+  })();
+</script>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<header id="tabbar">
+  <div class="brand">LLM<span>_Tuner</span></div>
+  <div id="tabs"></div>
+  <button id="addTab" class="btn icon" title="新建分页">+</button>
+  <div class="grow"></div>
+  <div id="connBadge" class="badge">未连接</div>
+  <button id="themeBtn" class="btn icon" title="主题">◐</button>
+  <button id="projBtn" class="btn">工程</button>
+  <button id="agentBtn" class="btn">智能体</button>
+</header>
+
+<main id="pages"></main>
+
+<div id="noserial" class="toast" hidden>
+  当前浏览器不支持 Web Serial（需要 Chrome / Edge 等 Chromium 内核浏览器，并通过 http://localhost 或 https 打开）。
+  你仍然可以使用「模拟数据源」体验完整功能。
+</div>
+
+<aside id="agentDrawer" class="drawer" hidden>
+  <header class="drawer-head">
+    <span>智能体</span>
+    <span class="grow"></span>
+    <button id="agentClose" class="btn icon" title="关闭">×</button>
+  </header>
+  <div class="agent-body">
+    <details class="agent-cfg" open>
+      <summary>接口配置（OpenAI 兼容）</summary>
+      <label class="erow"><span>Base URL</span><input id="agBase" placeholder="https://api.deepseek.com/v1"></label>
+      <label class="erow"><span>模型</span><input id="agModel" placeholder="deepseek-chat"></label>
+      <label class="erow"><span>API Key</span><input id="agKey" type="password" placeholder="sk-..."></label>
+      <label class="erow"><span>最大步数</span><input id="agSteps" type="number" min="1" max="20" value="8"></label>
+      <p class="hint">Key 只存在本机 localStorage，请求只发往你填写的地址。</p>
+    </details>
+    <label class="agent-goal">目的<textarea id="agGoal" rows="3" placeholder="例如：把 speed 环的 kp/ki 调到阶跃无超调，并说明你的判断依据"></textarea></label>
+    <div class="agent-actions">
+      <button id="agRun" class="btn primary">执行</button>
+      <button id="agStop" class="btn" disabled>停止</button>
+      <button id="agClear" class="btn ghost">清空日志</button>
+    </div>
+    <div id="agLog" class="agent-log"></div>
+  </div>
+</aside>
+
+<aside id="projDrawer" class="drawer wide" hidden>
+  <header class="drawer-head">
+    <span>工程与代码</span>
+    <span class="grow"></span>
+    <button id="projClose" class="btn icon" title="关闭">×</button>
+  </header>
+  <div class="proj-body">
+    <div class="pane-sec">
+      <h3>数据来源</h3>
+      <div class="proj-row">
+        <button id="projPick" class="btn">选择工程目录…</button>
+        <span id="projStatus" class="hint">未选择</span>
+      </div>
+      <details class="agent-cfg">
+        <summary>或者连接 VS Code 扩展桥接</summary>
+        <label class="erow"><span>地址</span><input id="projBridgeUrl" value="http://127.0.0.1:5173/api"></label>
+        <label class="erow"><span>令牌</span><input id="projBridgeToken" placeholder="扩展「复制桥接令牌」后的串"></label>
+        <div class="row-btns"><button id="projBridgeConnect" class="btn sm">连接工作区</button></div>
+      </details>
+    </div>
+
+    <div class="pane-sec">
+      <h3>参数 ↔ 代码 <span class="hint" id="projCount">尚未扫描</span></h3>
+      <div class="proj-rows" id="projRows">
+        <div class="empty">选择工程目录后，会扫描源码里的 tuner_add_arg(...) 调用并与在线参数表按名字匹配。</div>
+      </div>
+    </div>
+
+    <div class="pane-sec">
+      <div class="row-btns" style="flex-wrap:wrap">
+        <button id="projPreview" class="btn sm">预览改动</button>
+        <button id="projApply" class="btn sm primary">写回勾选项</button>
+        <button id="projRescan" class="btn sm ghost">重新扫描</button>
+        <button id="projExport" class="btn sm ghost">导出参数 JSON</button>
+      </div>
+      <pre id="projDiff" class="proj-diff" hidden></pre>
+    </div>
+  </div>
+</aside>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
